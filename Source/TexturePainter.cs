@@ -21,8 +21,8 @@ public enum GamePhase
 	Finished
 }
 
-public class TexturePainter : MonoBehaviour {
-
+public class TexturePainter : MonoBehaviour
+{
 	public int currentLevelIndex = 0;
 	public GamePhase gamePhase;
 
@@ -73,7 +73,7 @@ public class TexturePainter : MonoBehaviour {
 	bool needToCheckPaintedPercent = false;
 
 	void Start()
-    {
+	{
 		endGameUI.SetActive(false);
 		gamePhase = GamePhase.ClearRust;
 		baseMaterial.mainTexture = rustTexture;
@@ -89,16 +89,16 @@ public class TexturePainter : MonoBehaviour {
 	// this mask logic will help us to detect percantage of painted area of object
 	// also we dont need to check every pixel at texture with this logic
 	void ParseMaskPositions()
-    {
+	{
 		for(int i = 0; i < paintedMaskTexture.width; i++)
-        {
+		{
 			for(int j = 0; j < paintedMaskTexture.height; j++)
-            {
+    			{
 				Color currentColor = paintedMaskTexture.GetPixel(i, j);
 				if(currentColor != Color.white)
-                {
+                		{
 					if (currentColor == maskColor)
-                    {
+					{
 						Vector2 pos = new Vector2(i, j);
 						maskPositionsBackup.Add(pos);
 						maskPositions.Add(pos);
@@ -106,14 +106,14 @@ public class TexturePainter : MonoBehaviour {
 					}
 				}
 			}
-        }
+        	}
 
 		maskPixelCount = maskPositions.Count;
 	}
 
 	// this method will help us preventing frame drop when swaping gamePhase
 	void CreateCompletedTextures()
-    {
+    	{
 		cleanTexture = new Texture2D(canvasTexture.width, canvasTexture.height, TextureFormat.RGBA32, false);
 		for (int i = 0; i < canvasTexture.width; i++)
 		{
@@ -132,37 +132,37 @@ public class TexturePainter : MonoBehaviour {
 	}
 
 	void SetClickListeners()
-    {
+    	{
 		btnRestartLevel.onClick.AddListener(() => RestartLevel());
 		btnNextLevel.onClick.AddListener(() => NextLevel());
-    }
+    	}
 
 	void BackupCameraData()
-    {
+    	{
 		cameraPivotPos = cameraPivot.position;
 		cameraPivotRot = cameraPivot.rotation;
 
 		cameraPos = mainCamera.position;
 		cameraRot = mainCamera.rotation;
-    }
+    	}
 
 	void RestoreCameraData()
-    {
+    	{
 		cameraPivot.position = cameraPivotPos;
 		cameraPivot.rotation = cameraPivotRot;
 
 		mainCamera.position = cameraPos;
 		mainCamera.rotation = cameraRot;
-    }
+    	}
 
 	void RestartLevel()
-    {
+   	 {
 		Debug.Log("RestartLevel");
 		SceneManager.LoadScene(currentLevelIndex);
-    }
+    	}
 
 	void NextLevel()
-    {
+    	{
 		//SceneManager.LoadScene(currentLevelIndex + 1); // TODO
 	}
 
@@ -182,7 +182,7 @@ public class TexturePainter : MonoBehaviour {
 		if (Physics.Raycast(ray, out hit))
 		{
 			if(gamePhase == GamePhase.ClearRust)
-            {
+		    	{
 				goSponge.transform.position = Vector3.Slerp(goSponge.transform.position, hit.point, Time.deltaTime * toolMovementSpeed);
 				Quaternion qTemp = Quaternion.FromToRotation(goSponge.transform.forward, hit.normal * 2) * goSponge.transform.rotation;
 				Vector3 tempRot = qTemp.eulerAngles;
@@ -191,7 +191,7 @@ public class TexturePainter : MonoBehaviour {
 
 			}
 			else if(gamePhase == GamePhase.Painting)
-            {
+            		{
 				spray.transform.position = Vector3.Slerp(spray.transform.position, hit.normal * 2 + hit.point, Time.deltaTime * toolMovementSpeed);
 				Quaternion qTemp = Quaternion.FromToRotation(spray.transform.forward, hit.normal * 2) * spray.transform.rotation;
 				Vector3 tempRot = qTemp.eulerAngles;
@@ -199,16 +199,16 @@ public class TexturePainter : MonoBehaviour {
 				spray.transform.rotation = Quaternion.Slerp(spray.transform.rotation, Quaternion.Euler(tempRot), Time.deltaTime * toolRotationSpeed);
 			}
 		}else
-        {
+		{
 			if(gamePhase == GamePhase.ClearRust)
-            {
+            		{
 				Vector3 temp = Input.mousePosition;
 				temp.z = 10f;
 				goSponge.transform.position = Vector3.Slerp(goSponge.transform.position, Camera.main.ScreenToWorldPoint(temp), Time.deltaTime * toolMovementSpeed);
 				goSponge.transform.rotation = Quaternion.Slerp(goSponge.transform.rotation, Quaternion.Euler(new Vector3(0.0f, 180.0f, 0.0f)), Time.deltaTime * toolRotationSpeed);
 			}
 			else if(gamePhase == GamePhase.Painting)
-            {
+            		{
 				Vector3 temp = Input.mousePosition;
 				temp.z = 10f;
 				spray.transform.position = Vector3.Slerp(spray.transform.position, Camera.main.ScreenToWorldPoint(temp), Time.deltaTime * toolMovementSpeed);
@@ -218,7 +218,7 @@ public class TexturePainter : MonoBehaviour {
 
 		// left mouse button down
 		if (Input.GetMouseButtonDown(0))
-        {
+        	{
 			needToCheckPaintedPercent = true;
 			if (gamePhase == GamePhase.Painting)
 				spray.StartSpray();
@@ -229,15 +229,15 @@ public class TexturePainter : MonoBehaviour {
 
 		// release left mouse button
 		if (Input.GetMouseButtonUp(0))
-        {
+        	{
 			needToCheckPaintedPercent = true;
 			if (gamePhase == GamePhase.Painting)
 				spray.StopSpray();
 		}
 	}
 
-    void FixedUpdate()
-    {
+	void FixedUpdate()
+	{
 		if (gamePhase != GamePhase.Finished)
 			StartCoroutine(CheckPaintedPercent());
 	}
@@ -321,7 +321,7 @@ public class TexturePainter : MonoBehaviour {
 	}
 
 	bool IsThisPixelOk(Color mainColor, Color compareColor, float treshold)
-    {
+    	{
 		Color color1 = compareColor;
 		Color color2 = compareColor;
 
@@ -341,11 +341,13 @@ public class TexturePainter : MonoBehaviour {
 	}
 
 	//The main action, instantiates a brush or decal entity at the clicked position on the UV map
-	void DoAction(){	
+	void DoAction()
+	{	
 		if (saving)
 			return;
 		Vector3 uvWorldPosition=Vector3.zero;		
-		if(HitTestUVPosition(ref uvWorldPosition)){
+		if(HitTestUVPosition(ref uvWorldPosition))
+		{
 			GameObject brushObj;
 			//if(gamePhase == GamePhase.ClearRust)
 			//{
@@ -371,22 +373,29 @@ public class TexturePainter : MonoBehaviour {
 			Invoke("SaveTexture",0.1f);
 		}
 	}
+	
 	//To update at realtime the painting cursor on the mesh
-	void UpdateBrushCursor(){
+	void UpdateBrushCursor()
+	{
 		Vector3 uvWorldPosition=Vector3.zero;
-		if (gamePhase == GamePhase.Painting && HitTestUVPosition (ref uvWorldPosition) && !saving) {
+		if (gamePhase == GamePhase.Painting && HitTestUVPosition (ref uvWorldPosition) && !saving)
+		{
 			brushCursor.SetActive(true);
 			brushCursor.transform.position =uvWorldPosition+brushContainer.transform.position;									
-		} else {
+		} else
+		{
 			brushCursor.SetActive(false);
 		}		
 	}
+	
 	//Returns the position on the texuremap according to a hit in the mesh collider
-	bool HitTestUVPosition(ref Vector3 uvWorldPosition){
+	bool HitTestUVPosition(ref Vector3 uvWorldPosition)
+	{
 		RaycastHit hit;
 		Vector3 cursorPos = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0.0f);
 		Ray cursorRay=sceneCamera.ScreenPointToRay (cursorPos);
-		if (Physics.Raycast(cursorRay,out hit,200)){
+		if (Physics.Raycast(cursorRay,out hit,200))
+		{
 			MeshCollider meshCollider = hit.collider as MeshCollider;
 			if (meshCollider == null || meshCollider.sharedMesh == null)
 				return false;			
@@ -396,13 +405,16 @@ public class TexturePainter : MonoBehaviour {
 			uvWorldPosition.z=0.0f;
 			return true;
 		}
-		else{		
+		else
+		{		
 			return false;
 		}
 		
 	}
+	
 	//Sets the base material with a our canvas texture, then removes all our brushes
-	void SaveTexture(){		
+	void SaveTexture()
+	{		
 		brushCounter=0;
 		System.DateTime date = System.DateTime.Now;
 		RenderTexture.active = canvasTexture;
@@ -411,24 +423,30 @@ public class TexturePainter : MonoBehaviour {
 		tex.Apply ();
 		RenderTexture.active = null;
 		baseMaterial.mainTexture =tex;	//Put the painted texture as the base
-		foreach (Transform child in brushContainer.transform) {//Clear brushes
+		foreach (Transform child in brushContainer.transform)
+		{//Clear brushes
 			Destroy(child.gameObject);
 		}
 		//StartCoroutine ("SaveTextureToFile"); //Do you want to save the texture? This is your method!
 		Invoke ("ShowCursor", 0.1f);
 	}
+	
 	//Show again the user cursor (To avoid saving it to the texture)
-	void ShowCursor(){	
+	void ShowCursor()
+	{	
 		saving = false;
 	}
 
 	////////////////// PUBLIC METHODS //////////////////
 
-	public void SetBrushMode(Painter_BrushMode brushMode){ //Sets if we are painting or placing decals
+	public void SetBrushMode(Painter_BrushMode brushMode)
+	{ //Sets if we are painting or placing decals
 		mode = brushMode;
 		brushCursor.GetComponent<SpriteRenderer> ().sprite = brushMode == Painter_BrushMode.PAINT ? cursorPaint : cursorDecal;
 	}
-	public void SetBrushSize(float newBrushSize){ //Sets the size of the cursor brush or decal
+	
+	public void SetBrushSize(float newBrushSize)
+	{ //Sets the size of the cursor brush or decal
 		brushSize = newBrushSize;
 		brushCursor.transform.localScale = Vector3.one * brushSize;
 	}
@@ -436,7 +454,8 @@ public class TexturePainter : MonoBehaviour {
 	////////////////// OPTIONAL METHODS //////////////////
 
 	#if !UNITY_WEBPLAYER 
-		IEnumerator SaveTextureToFile(Texture2D savedTexture){		
+		IEnumerator SaveTextureToFile(Texture2D savedTexture)
+		{		
 			brushCounter=0;
 			string fullPath=System.IO.Directory.GetCurrentDirectory()+"\\UserCanvas\\";
 			System.DateTime date = System.DateTime.Now;
